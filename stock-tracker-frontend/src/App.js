@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import StockList from "./components/StockList";
 import StockInfo from "./components/StockInfo";
 
+// Router component with two routes for StockList and StockInfo
 function App() {
     return (
         <Router>

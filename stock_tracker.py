@@ -7,11 +7,13 @@ CORS(app)
 
 API_KEY = "UDJ8FEEUYB4NYVJ6"
 
+# get the portfolio of a user
 @app.route('/<user_id>')
 def index(user_id):
     portfolio = get_portfolio(user_id)
     return jsonify(portfolio)
 
+# get the stock info of a symbol from the Alpha Vantage API
 @app.route('/stockinfo/<symbol>')
 def stock_info(symbol):
     response = requests.get(f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={symbol}&apikey={API_KEY}") 
@@ -19,6 +21,7 @@ def stock_info(symbol):
     output = list(data['Time Series (Daily)'].items())[0:5]
     return jsonify(output)
 
+# get stocks in a user's portfolio, hardcoded for now
 def get_portfolio(user_id):
     user_portfolio_db = {
         'user1': {

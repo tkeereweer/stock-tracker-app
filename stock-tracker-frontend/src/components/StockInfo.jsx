@@ -6,6 +6,7 @@ function numberWithCommas(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
+// Assuming the backend returns an array of arrays, where each inner array contains a date and an object with stock information
 function StockInfo() {
     const { symbol } = useParams();
     const [stockInfo, setStockInfo] = useState([]);
