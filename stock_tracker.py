@@ -1,11 +1,16 @@
 from flask import Flask, jsonify
+from dotenv import load_dotenv
+import os
 from flask_cors import CORS
 import requests
 
 app = Flask(__name__)
 CORS(app)
 
-API_KEY = "UDJ8FEEUYB4NYVJ6"
+# load the environment variables
+load_dotenv()
+
+API_KEY = os.getenv('API_KEY')
 
 # get the portfolio of a user
 @app.route('/<user_id>')

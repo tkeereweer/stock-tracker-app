@@ -1,0 +1,26 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# environment variables
+.env
+
+# dependencies
+/stock-tracker-frontend/node_modules
+/stock-tracker-frontend/.pnp
+/stock-tracker-frontend.pnp.js
+
+# testing
+/stock-tracker-frontend/coverage
+
+# production
+/stock-tracker-frontend/build
+
+# misc
+/stock-tracker-frontend.DS_Store
+/stock-tracker-frontend.env.local
+/stock-tracker-frontend.env.development.local
+/stock-tracker-frontend.env.test.local
+/stock-tracker-frontend.env.production.local
+
+/stock-tracker-frontendnpm-debug.log*
+/stock-tracker-frontendyarn-debug.log*
+/stock-tracker-frontendyarn-error.log*
