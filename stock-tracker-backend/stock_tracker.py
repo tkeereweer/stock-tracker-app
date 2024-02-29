@@ -43,4 +43,4 @@ def get_portfolio(user_id):
     return user_portfolio_db.get(user_id, {})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
