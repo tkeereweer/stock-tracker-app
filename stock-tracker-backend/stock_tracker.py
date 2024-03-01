@@ -8,9 +8,10 @@ app = Flask(__name__)
 CORS(app)
 
 # load the environment variables
-load_dotenv()
+# load_dotenv()
 
-API_KEY = os.getenv('API_KEY')
+# API_KEY = os.getenv('API_KEY')
+API_KEY = 'UDJ8FEEUYB4NYVJ6'
 
 # get the portfolio of a user
 @app.route('/<user_id>')
