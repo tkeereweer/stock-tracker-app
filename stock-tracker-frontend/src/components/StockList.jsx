@@ -6,7 +6,7 @@ function StockList() {
     const [portfolio, setPortfolio] = useState([]);
 
     useEffect(() => {
-        fetch("http://127.0.0.1:5000/user1") // Assuming user1 for demonstration
+        fetch("https://mcsbt-integration-415614.oa.r.appspot.com/user1") // Assuming user1 for demonstration
             .then((response) => response.json())
             .then((data) => {
                 setPortfolio(data); // Assuming the backend returns an object with stock symbols as keys and quantities held as values

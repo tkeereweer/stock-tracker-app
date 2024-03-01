@@ -12,7 +12,9 @@ function StockInfo() {
     const [stockInfo, setStockInfo] = useState([]);
 
     useEffect(() => {
-        fetch(`http://127.0.0.1:5000/stockinfo/${symbol}`)
+        fetch(
+            `https://mcsbt-integration-415614.oa.r.appspot.com/stockinfo/${symbol}`
+        )
             .then((response) => response.json())
             .then((data) => {
                 setStockInfo(data);
