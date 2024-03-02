@@ -9,14 +9,16 @@ function StockList() {
         fetch("https://mcsbt-integration-415614.oa.r.appspot.com/user1") // Assuming user1 for demonstration
             .then((response) => response.json())
             .then((data) => {
-                setPortfolio(data); // Assuming the backend returns an object with stock symbols as keys and quantities held as values
+                setPortfolio(data); // Update this line to handle the new data structure
             })
             .catch((error) =>
                 console.error("Error fetching portfolio:", error)
             );
     }, []);
 
-    // Assuming the backend returns an object with stock symbols as keys and quantities held as values
+    // Extract total value if it exists
+    const totalValue = portfolio.length > 0 ? portfolio[0].total_value : 0;
+
     return (
         <div className="container">
             <h1>Stock Portfolio</h1>
@@ -25,19 +27,30 @@ function StockList() {
                     <tr>
                         <th>Stock Symbol</th>
                         <th>Quantity</th>
+                        <th>Value</th> {/* New column for value */}
                     </tr>
                 </thead>
                 <tbody>
-                    {Object.entries(portfolio).map(([stock, quantity]) => (
-                        <tr key={stock}>
-                            <td>
-                                <Link to={`/stockinfo/${stock}`}>{stock}</Link>
-                            </td>
-                            <td>{quantity}</td>
-                        </tr>
-                    ))}
+                    {portfolio.slice(1).map((item, index) => {
+                        const stock = Object.keys(item)[0];
+                        const details = item[stock];
+                        return (
+                            <tr key={index}>
+                                <td>
+                                    <Link to={`/stockinfo/${stock}`}>
+                                        {stock}
+                                    </Link>
+                                </td>
+                                <td>{details.quantity}</td>
+                                <td>${details.value}</td>{" "}
+                                {/* Displaying value */}
+                            </tr>
+                        );
+                    })}
                 </tbody>
             </table>
+            {/* Displaying total portfolio value */}
+            <p>Total Portfolio Value: ${totalValue}</p>
         </div>
     );
 }
