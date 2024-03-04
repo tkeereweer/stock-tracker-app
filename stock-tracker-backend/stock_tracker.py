@@ -16,7 +16,7 @@ API_KEY = 'UDJ8FEEUYB4NYVJ6'
 stock_values = {}
 
 # get stocks in a user's portfolio, hardcoded for now
-def get_portfolio(user_id):
+def user_database(user_id):
     user_portfolio_db = {
         'user1': {
             'AAPL': 10,
@@ -32,7 +32,7 @@ def get_portfolio(user_id):
     return user_portfolio_db.get(user_id, {})
 
 # get values for stocks
-def get_values(portfolio):
+def get_past_values(portfolio):
     for stock in portfolio:
         if stock in stock_values:
             continue
@@ -46,26 +46,26 @@ def get_values(portfolio):
 # get the portfolio of a user
 @app.route('/<user_id>')
 def index(user_id):
-    portfolio = get_portfolio(user_id)
-    get_values(portfolio.keys())
-    output = []
+    portfolio = user_database(user_id)
+    get_past_values(portfolio.keys())
+    output = {'symbols': {}}
     total_value = 0
     for stock in portfolio:
         close_price = float(stock_values[stock][0][1]['4. close'])
         stock_value = round(close_price * portfolio[stock], 2)
         total_value += stock_value
-        output.append({stock: {
+        output['symbols'][stock] = {
             'quantity': portfolio[stock],
             'value': stock_value
-            }})
-    output.insert(0, {'total_value': total_value})
+        }
+    output['total_value']= total_value
     return jsonify(output)
 
 # serve the stock info for a given symbol
 @app.route('/stockinfo/<symbol>')
 def stock_info(symbol):
     if symbol not in stock_values:
-        get_values([symbol])
+        get_past_values([symbol])
     output = stock_values[symbol]
     return jsonify(output)
 

@@ -3,25 +3,24 @@ import { Link } from "react-router-dom";
 import "./StockList.css";
 
 function StockList() {
-    const [portfolio, setPortfolio] = useState([]);
+    const [portfolio, setPortfolio] = useState({ total_value: 0, symbols: {} });
 
     useEffect(() => {
-        fetch("https://mcsbt-integration-415614.oa.r.appspot.com/user1") // Assuming user1 for demonstration
+        fetch("http://127.0.0.1:5000/user1") // Assuming user1 for demonstration
             .then((response) => response.json())
             .then((data) => {
-                setPortfolio(data); // Update this line to handle the new data structure
+                setPortfolio(data); // Set the entire data structure
             })
             .catch((error) =>
                 console.error("Error fetching portfolio:", error)
             );
     }, []);
 
-    // Extract total value if it exists
-    const totalValue = portfolio.length > 0 ? portfolio[0].total_value : 0;
-
     return (
         <div className="container">
             <h1>Stock Portfolio</h1>
+            {/* Displaying total portfolio value */}
+            <p>Total Portfolio Value: ${portfolio.total_value}</p>
             <table>
                 <thead>
                     <tr>
@@ -31,10 +30,8 @@ function StockList() {
                     </tr>
                 </thead>
                 <tbody>
-                    {portfolio.slice(1).map((item, index) => {
-                        const stock = Object.keys(item)[0];
-                        const details = item[stock];
-                        return (
+                    {Object.entries(portfolio.symbols).map(
+                        ([stock, details], index) => (
                             <tr key={index}>
                                 <td>
                                     <Link to={`/stockinfo/${stock}`}>
@@ -45,12 +42,10 @@ function StockList() {
                                 <td>${details.value}</td>{" "}
                                 {/* Displaying value */}
                             </tr>
-                        );
-                    })}
+                        )
+                    )}
                 </tbody>
             </table>
-            {/* Displaying total portfolio value */}
-            <p>Total Portfolio Value: ${totalValue}</p>
         </div>
     );
 }
