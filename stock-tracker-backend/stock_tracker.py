@@ -34,13 +34,10 @@ def user_database(user_id):
 # get values for stocks
 def get_past_values(portfolio):
     for stock in portfolio:
-        if stock in stock_values:
-            continue
         response = requests.get(f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={stock}&apikey={API_KEY}") 
         data = response.json()
         stock_values_lst = list(data['Time Series (Daily)'].items())[0:5]
         stock_values[stock] = stock_values_lst
-        print(stock_values)
     return stock_values
 
 # get the portfolio of a user
