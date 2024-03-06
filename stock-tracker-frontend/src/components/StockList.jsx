@@ -4,17 +4,28 @@ import "./StockList.css";
 
 function StockList() {
     const [portfolio, setPortfolio] = useState({ total_value: 0, symbols: {} });
+    const [error, setError] = useState(null);
 
     useEffect(() => {
-        fetch("https://mcsbt-integration-415614.oa.r.appspot.com/user1") // Assuming user1 for demonstration
-            .then((response) => response.json())
+        fetch("https://mcsbt-integration-415614.oa.r.appspot.com/user1")
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error("Network response was not ok");
+                }
+                return response.json();
+            })
             .then((data) => {
                 setPortfolio(data); // Set the entire data structure
             })
-            .catch((error) =>
-                console.error("Error fetching portfolio:", error)
-            );
+            .catch((error) => {
+                console.error("Error fetching portfolio:", error);
+                setError("Failed to fetch portfolio. Please try again later.");
+            });
     }, []);
+
+    if (error) {
+        return <div className="container">{error}</div>;
+    }
 
     return (
         <div className="container">
@@ -26,7 +37,7 @@ function StockList() {
                     <tr>
                         <th>Stock Symbol</th>
                         <th>Quantity</th>
-                        <th>Value</th> {/* New column for value */}
+                        <th>Value</th>
                     </tr>
                 </thead>
                 <tbody>

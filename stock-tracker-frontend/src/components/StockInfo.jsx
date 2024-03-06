@@ -6,23 +6,35 @@ function numberWithCommas(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
-// Assuming the backend returns an array of arrays, where each inner array contains a date and an object with stock information
 function StockInfo() {
     const { symbol } = useParams();
     const [stockInfo, setStockInfo] = useState([]);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         fetch(
             `https://mcsbt-integration-415614.oa.r.appspot.com/stockinfo/${symbol}`
         )
-            .then((response) => response.json())
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error("Network response was not ok");
+                }
+                return response.json();
+            })
             .then((data) => {
                 setStockInfo(data);
             })
-            .catch((error) =>
-                console.error("Error fetching stock info:", error)
-            );
+            .catch((error) => {
+                console.error("Error fetching stock info:", error);
+                setError(
+                    "Failed to fetch stock information. Please try again later."
+                );
+            });
     }, [symbol]);
+
+    if (error) {
+        return <div className="container">{error}</div>;
+    }
 
     return (
         <div className="container">

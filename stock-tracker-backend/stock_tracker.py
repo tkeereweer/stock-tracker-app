@@ -34,11 +34,16 @@ def user_database(user_id):
 # get values for stocks
 def get_past_values(portfolio):
     for stock in portfolio:
-        response = requests.get(f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={stock}&apikey={API_KEY}") 
-        data = response.json()
-        stock_values_lst = list(data['Time Series (Daily)'].items())[0:5]
-        stock_values[stock] = stock_values_lst
+        try:
+            response = requests.get(f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={stock}&apikey={API_KEY}") 
+            response.raise_for_status()  # Raises HTTPError for bad response status codes
+            data = response.json()
+            stock_values_lst = list(data['Time Series (Daily)'].items())[0:5]
+            stock_values[stock] = stock_values_lst
+        except requests.exceptions.RequestException as e:
+            print(f"Error fetching data for {stock}: {e}")
     return stock_values
+
 
 # get the portfolio of a user
 @app.route('/<user_id>')
@@ -55,7 +60,7 @@ def index(user_id):
             'quantity': portfolio[stock],
             'value': stock_value
         }
-    output['total_value']= total_value
+    output['total_value']= round(total_value, 2)
     return jsonify(output)
 
 # serve the stock info for a given symbol
