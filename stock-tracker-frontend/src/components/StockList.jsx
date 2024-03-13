@@ -7,7 +7,7 @@ function StockList() {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        fetch("https://mcsbt-integration-415614.oa.r.appspot.com/user1")
+        fetch("https://mcsbt-integration-415614.oa.r.appspot.com/stocklist")
             .then((response) => {
                 if (!response.ok) {
                     throw new Error("Network response was not ok");

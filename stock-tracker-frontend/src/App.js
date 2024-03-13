@@ -2,6 +2,8 @@ import React from "react";
 import { HashRouter as Router, Routes, Route } from "react-router-dom";
 import StockList from "./components/StockList";
 import StockInfo from "./components/StockInfo";
+import LoginPage from "./components/LoginPage";
+import RegisterPage from "./components/RegisterPage";
 
 // Header component to display the application name
 function Header() {
@@ -19,7 +21,9 @@ function App() {
             <div className="App">
                 <Header />
                 <Routes>
-                    <Route path="/" element={<StockList />} />
+                    <Route path="/" element={<LoginPage />} />
+                    <Route path="/register" element={<RegisterPage />} />
+                    <Route path="/stocklist" element={<StockList />} />
                     <Route path="/stockinfo/:symbol" element={<StockInfo />} />
                 </Routes>
             </div>
