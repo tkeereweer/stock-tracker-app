@@ -34,6 +34,16 @@ tr:hover {
     background-color: #e0e0e0;
 }
 
+.error {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #ffdddd;
+    border-left: 4px solid #ff0000;
+    color: #d8000c;
+    font-size: 14px;
+    text-align: left;
+}
+
 a {
     text-decoration: none;
     color: #007bff;

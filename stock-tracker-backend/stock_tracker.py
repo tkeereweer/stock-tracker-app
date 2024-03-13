@@ -115,7 +115,7 @@ def logout():
 def stocklist():
     if 'user_id' not in session:
         return redirect("https://storage.googleapis.com/capstone-frontend/index.html")
-    user_id = session['user_id']
+    user_id = int(session['user_id'])
     portfolio = user_database(user_id)
     get_past_values(portfolio.keys())
     output = {'symbols': {}}
@@ -135,9 +135,9 @@ app.route('/modifyPortfolio', methods=['PUT'])
 def modify_portfolio():
     if 'user_id' not in session:
         return redirect("https://storage.googleapis.com/capstone-frontend/index.html")
-    user_id = session['user_id']
+    user_id = int(session['user_id'])
     stock = request.form['stock_symbol']
-    quantity = request.form['quantity']
+    quantity = int(request.form['quantity'])
     operation = request.form['operation']
     if operation == 'add':
         add_stock(user_id, stock, quantity)
@@ -148,7 +148,7 @@ def modify_portfolio():
 def add_stock(user_id, stock, quantity):
     real_stock_check = requests.get(f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={stock}&apikey={API_KEY}")
     if real_stock_check.status_code != 200:
-        return "stock not found", 400
+        return jsonify({"error": "Stock not found"}), 400
     insert_query = text("""
         INSERT INTO user_stocks (user_id, stock, quantity) 
         VALUES (:user_id, :stock, :quantity)
@@ -158,14 +158,14 @@ def add_stock(user_id, stock, quantity):
         with connection.begin() as transaction:
             connection.execute(insert_query, {"user_id": user_id, "stock": stock, "quantity": quantity})
             transaction.commit()
-    return redirect(url_for('stocklist'))
+    return redirect("https://storage.googleapis.com/capstone-frontend/index.html#/overview")
 
 # remove a stock from a user's portfolio
 def remove_stock(user_id, stock, quantity):
     if stock not in portfolio:
-        return "stock not in portfolio", 400
+        return jsonify({"error": "Stock not in portfolio"}), 400
     elif portfolio[stock] < quantity:
-        return "not enough stock", 400
+        return jsonify({"error": "Quantity too high"}), 400
     elif portfolio[stock] == quantity:
         remove_query = text("""
             DELETE FROM user_stocks 
@@ -185,7 +185,7 @@ def remove_stock(user_id, stock, quantity):
             with connection.begin() as transaction:
                 connection.execute(remove_query, {"user_id": user_id, "stock": stock, "quantity": quantity})
                 transaction.commit()
-    return redirect(url_for('stocklist'))
+    return redirect("https://storage.googleapis.com/capstone-frontend/index.html#/overview")
 
 # serve the stock info for a given symbol
 @app.route('/stockinfo/<symbol>')
