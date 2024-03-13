@@ -7,7 +7,7 @@ function StockList() {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        fetch("https://mcsbt-integration-415614.oa.r.appspot.com/stocklist")
+        fetch("https://mcsbt-integration-415614.oa.r.appspot.com/overview")
             .then((response) => {
                 if (!response.ok) {
                     throw new Error("Network response was not ok");
@@ -30,6 +30,31 @@ function StockList() {
     return (
         <div className="container">
             <h1>Stock Portfolio</h1>
+            <h1>Stock Portfolio</h1>
+            <form
+                method="PUT"
+                action="https://mcsbt-integration-415614.oa.r.appspot.com/modifyPortfolio"
+            >
+                <input
+                    type="text"
+                    name="stock_symbol"
+                    placeholder="Stock Symbol"
+                    required
+                />
+                <input
+                    type="number"
+                    name="quantity"
+                    placeholder="Quantity"
+                    required
+                />
+                <div>
+                    <input type="radio" name="operation" value="add" />
+                    Add
+                    <input type="radio" name="operation" value="remove" />
+                    Remove
+                </div>
+                <button type="submit">Submit</button>
+            </form>
             {/* Displaying total portfolio value */}
             <p>Total Portfolio Value: ${portfolio.total_value}</p>
             <table>

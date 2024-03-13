@@ -84,7 +84,7 @@ def handle_register():
             transaction.commit()
         user = connection.execute(get_user_query, {"username": username}).fetchone()
         session["user_id"] = user[0]
-    return redirect(url_for("stocklist"))
+    return redirect("https://storage.googleapis.com/capstone-frontend/index.html#/overview")
 
 @app.route("/login", methods=["POST"])
 def handle_login():
@@ -103,18 +103,18 @@ def handle_login():
             session["user_id"] = user[0]
         else:
             return "user doesn't exist", 403
-    return redirect(url_for("stocklist"))
+    return redirect("https://storage.googleapis.com/capstone-frontend/index.html#/overview")
 
 @app.route("/logout")
 def logout():
     session.pop("user_id")
-    return redirect(url_for("handle_login"))
+    return redirect("https://storage.googleapis.com/capstone-frontend/index.html")
 
 # get the portfolio of a user
-@app.route('/stocklist')
+@app.route('/overview')
 def stocklist():
     if 'user_id' not in session:
-        return redirect(url_for('handle_login'))
+        return redirect("https://storage.googleapis.com/capstone-frontend/index.html")
     user_id = session['user_id']
     portfolio = user_database(user_id)
     get_past_values(portfolio.keys())
@@ -134,7 +134,7 @@ def stocklist():
 app.route('/modifyPortfolio', methods=['PUT'])
 def modify_portfolio():
     if 'user_id' not in session:
-        return redirect(url_for('handle_login'))
+        return redirect("https://storage.googleapis.com/capstone-frontend/index.html")
     user_id = session['user_id']
     stock = request.form['stock_symbol']
     quantity = request.form['quantity']
@@ -146,6 +146,9 @@ def modify_portfolio():
 
 # add a stock to a user's portfolio
 def add_stock(user_id, stock, quantity):
+    real_stock_check = requests.get(f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={stock}&apikey={API_KEY}")
+    if real_stock_check.status_code != 200:
+        return "stock not found", 400
     insert_query = text("""
         INSERT INTO user_stocks (user_id, stock, quantity) 
         VALUES (:user_id, :stock, :quantity)
@@ -161,7 +164,7 @@ def add_stock(user_id, stock, quantity):
 def remove_stock(user_id, stock, quantity):
     if stock not in portfolio:
         return "stock not in portfolio", 400
-    if portfolio[stock] < quantity:
+    elif portfolio[stock] < quantity:
         return "not enough stock", 400
     elif portfolio[stock] == quantity:
         remove_query = text("""

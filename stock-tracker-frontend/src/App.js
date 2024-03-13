@@ -23,7 +23,7 @@ function App() {
                 <Routes>
                     <Route path="/" element={<LoginPage />} />
                     <Route path="/register" element={<RegisterPage />} />
-                    <Route path="/stocklist" element={<StockList />} />
+                    <Route path="/overview" element={<StockList />} />
                     <Route path="/stockinfo/:symbol" element={<StockInfo />} />
                 </Routes>
             </div>
