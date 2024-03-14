@@ -13,7 +13,10 @@ function StockList() {
     });
 
     useEffect(() => {
-        fetch("https://mcsbt-integration-415614.oa.r.appspot.com/overview")
+        fetch("https://mcsbt-integration-415614.oa.r.appspot.com/overview", {
+            credentials: "include",
+            redirect: "follow",
+        })
             .then((response) => {
                 if (!response.ok) {
                     throw new Error("Network response was not ok");
@@ -38,33 +41,48 @@ function StockList() {
         setForm({ ...form, [name]: value });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        fetch(
-            "https://mcsbt-integration-415614.oa.r.appspot.com/modifyPortfolio",
-            {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(form),
-            }
-        )
-            .then((response) => {
-                if (!response.ok) {
-                    return response.json().then((data) => {
-                        throw new Error(data.error);
-                    });
+        setFormError(null); // Reset any existing errors
+
+        try {
+            const modifyResponse = await fetch(
+                "https://mcsbt-integration-415614.oa.r.appspot.com/modifyPortfolio",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(form),
+                    credentials: "include",
                 }
-                return response.json();
-            })
-            .then((data) => {
-                setPortfolio(data); // Update portfolio data
-                setFormError(null); // Clear any existing error messages
-            })
-            .catch((error) => {
-                setFormError(error.message);
-            });
+            );
+
+            if (!modifyResponse.ok) {
+                const errorData = await modifyResponse.json();
+                throw new Error(
+                    errorData.error || "Failed to modify portfolio"
+                );
+            }
+
+            // Fetch the updated stocklist after successful modification
+            const overviewResponse = await fetch(
+                "https://mcsbt-integration-415614.oa.r.appspot.com/overview",
+                {
+                    credentials: "include",
+                    redirect: "follow",
+                }
+            );
+
+            if (!overviewResponse.ok) {
+                throw new Error("Failed to fetch updated portfolio.");
+            }
+
+            const updatedPortfolio = await overviewResponse.json();
+            setPortfolio(updatedPortfolio);
+        } catch (error) {
+            setFormError(error.message);
+        }
     };
 
     if (error) {
