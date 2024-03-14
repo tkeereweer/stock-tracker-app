@@ -40,9 +40,9 @@ def hash_value(string):
 def user_database(user_id):
     global portfolio
     user_stocks_query = text("""
-        SELECT stock, quantity
-        FROM user_stocks
-        WHERE user_id=:user_id;
+        SELECT STOCKSYMBOL, QUANTITY
+        FROM USER_STOCKS
+        WHERE USERID=:user_id;
     """)
     with engine.connect() as connection:
         stocks = connection.execute(user_stocks_query, {"user_id": user_id}).fetchall()
@@ -70,12 +70,12 @@ def handle_register():
     username = str(request.form["username"])
     password = str(hash_value(request.form["password"]))
     insert_query = text("""
-        INSERT INTO users(username, password)
+        INSERT INTO USERS(USERNAME, PASSWORD)
         VALUES (:username, :password);
     """)
     get_user_query = text("""
-        SELECT user_id, username FROM users 
-        WHERE username=:username;
+        SELECT USERID, USERNAME FROM USERS 
+        WHERE USERNAME=:username;
     """)
     with engine.connect() as connection:
         with connection.begin() as transaction:
@@ -85,16 +85,16 @@ def handle_register():
             transaction.commit()
         user = connection.execute(get_user_query, {"username": username}).fetchone()
         session["user_id"] = user[0]
-    return redirect("https://storage.googleapis.com/capstone-frontend/index.html#/overview")
+    return jsonify({"message": "Registration successful"}), 200
 
 @app.route("/login", methods=["POST"])
 def handle_login():
     username = request.form["username"]
     password = hash_value(request.form["password"])
     login_query = text("""
-        SELECT user_id, username
-        FROM users
-        WHERE username=:username and password=:password
+        SELECT USERID, USERNAME
+        FROM USERS
+        WHERE USERNAME=:username and PASSWORD=:password
     """)
     with engine.connect() as connection:
         user = connection.execute(
@@ -116,7 +116,7 @@ def logout():
 def stocklist():
     # if 'user_id' not in session:
     #     return redirect("https://storage.googleapis.com/capstone-frontend/index.html")
-    user_id = 13
+    user_id = 1
     portfolio = user_database(user_id)
     get_past_values(portfolio.keys())
     output = {'symbols': {}}
@@ -137,7 +137,7 @@ def modify_portfolio():
     data = request.get_json()
     if data is None:
         return jsonify({"error": "Invalid JSON or no data provided"}), 400
-    user_id = 13  # This should ideally come from the session or request, not hardcoded
+    user_id = 1  # This should ideally come from the session or request, not hardcoded
     stock = data.get('stock_symbol')
     quantity = data.get('quantity')
     operation = data.get('operation')
@@ -154,13 +154,14 @@ def modify_portfolio():
 
 # add a stock to a user's portfolio
 def add_stock(user_id, stock, quantity):
-    real_stock_check = requests.get(f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={stock}&apikey={API_KEY}")
-    if real_stock_check.json()["Error message"] is not None:
+    response = requests.get(f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={stock}&apikey={API_KEY}")
+    real_stock_check = response.json()
+    if "Error Message" in real_stock_check.keys():
         return jsonify({"error": "Invalid stock symbol"}), 400
     insert_query = text("""
-        INSERT INTO user_stocks (user_id, stock, quantity) 
+        INSERT INTO USER_STOCKS (USERID, STOCKSYMBOL, QUANTITY) 
         VALUES (:user_id, :stock, :quantity)
-        ON DUPLICATE KEY UPDATE quantity = quantity + :quantity;
+        ON DUPLICATE KEY UPDATE QUANTITY = QUANTITY + :quantity;
     """)
     with engine.connect() as connection:
         with connection.begin() as transaction:
@@ -177,8 +178,8 @@ def remove_stock(user_id, stock, quantity):
         return jsonify({"error": "Requested quantity exceeds stocks in portfolio"}), 400
     elif portfolio[stock] == quantity:
         remove_query = text("""
-            DELETE FROM user_stocks 
-            WHERE user_id = :user_id AND stock = :stock;
+            DELETE FROM USER_STOCKS 
+            WHERE USERID = :user_id AND STOCKSYMBOL = :stock;
         """)
         with engine.connect() as connection:
             with connection.begin() as transaction:
@@ -187,9 +188,9 @@ def remove_stock(user_id, stock, quantity):
         user_database(user_id)
     elif portfolio[stock] > quantity:
         remove_query = text("""
-            UPDATE user_stocks 
-            SET quantity = quantity - :quantity 
-            WHERE user_id = :user_id AND stock = :stock;
+            UPDATE USER_STOCKS 
+            SET QUANTITY = QUANTITY - :quantity 
+            WHERE USERID = :user_id AND STOCKSYMBOL = :stock;
         """)
         with engine.connect() as connection:
             with connection.begin() as transaction:
