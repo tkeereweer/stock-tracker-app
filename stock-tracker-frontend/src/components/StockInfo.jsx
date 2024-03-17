@@ -1,6 +1,27 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import { Line } from "react-chartjs-2";
+import {
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend,
+} from "chart.js";
 import "./StockInfo.css";
+
+ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend
+);
 
 function numberWithCommas(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -9,6 +30,17 @@ function numberWithCommas(x) {
 function StockInfo() {
     const { symbol } = useParams();
     const [stockInfo, setStockInfo] = useState([]);
+    const [chartData, setChartData] = useState({
+        labels: [],
+        datasets: [
+            {
+                label: "Close Price",
+                data: [],
+                backgroundColor: "rgba(53, 162, 235, 0.5)",
+                borderColor: "rgba(53, 162, 235, 1)",
+            },
+        ],
+    });
     const [error, setError] = useState(null);
 
     useEffect(() => {
@@ -23,6 +55,23 @@ function StockInfo() {
             })
             .then((data) => {
                 setStockInfo(data);
+                if (data && Array.isArray(data)) {
+                    const dates = data.map((item) => item[0]);
+                    const closePrices = data.map((item) =>
+                        Number(item[1]["4. close"])
+                    );
+                    setChartData({
+                        labels: dates,
+                        datasets: [
+                            {
+                                label: "Close Price",
+                                data: closePrices,
+                                backgroundColor: "rgba(53, 162, 235, 0.5)",
+                                borderColor: "rgba(53, 162, 235, 1)",
+                            },
+                        ],
+                    });
+                }
             })
             .catch((error) => {
                 console.error("Error fetching stock info:", error);
@@ -39,6 +88,7 @@ function StockInfo() {
     return (
         <div className="container">
             <h1>Stock Information for {symbol}</h1>
+            <Line data={chartData} key={chartData.labels.length} />
             <table>
                 <thead>
                     <tr>
