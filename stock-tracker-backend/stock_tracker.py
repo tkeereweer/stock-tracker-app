@@ -9,7 +9,12 @@ import requests
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "super secret key"
-CORS(app, supports_credentials=True)
+app.config['SESSION_COOKIE_SAMESITE'] = 'None'
+app.config['SESSION_COOKIE_SECURE'] = True
+CORS(
+    app,
+    supports_credentials=True,
+    resources={r"/*": {"origins": "*"}})
 
 # database connection
 db_user = "flask-stock-tracker"
@@ -58,7 +63,7 @@ def get_past_values(portfolio):
             response = requests.get(f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={stock}&apikey={API_KEY}") 
             response.raise_for_status()  # Raises HTTPError for bad response status codes
             data = response.json()
-            stock_values_lst = list(data['Time Series (Daily)'].items())[0:5]
+            stock_values_lst = list(data['Time Series (Daily)'].items())[0:20]
             stock_values[stock] = stock_values_lst
         except requests.exceptions.RequestException as e:
             print(f"Error fetching data for {stock}: {e}")
@@ -84,6 +89,7 @@ def handle_register():
             )
             transaction.commit()
         user = connection.execute(get_user_query, {"username": username}).fetchone()
+        session.permanent = True
         session["user_id"] = user[0]
     return jsonify({"message": "Registration successful"}), 200
 
@@ -101,8 +107,11 @@ def handle_login():
             login_query, {"username": username, "password": password}
         ).fetchone()
         if user:
+            session.permanent = True
             session["user_id"] = user[0]
-            return jsonify({"message": "Login successful"}), 200
+            response = jsonify({"message": "Login successful"})
+            # response.set_cookie('session', str(session["user_id"]), httponly=True, samesite='Lax')
+            return response, 200
         else:
             return jsonify({"error": "Invalid credentials"}), 401
 
@@ -114,9 +123,10 @@ def logout():
 # get the portfolio of a user
 @app.route('/overview')
 def stocklist():
-    # if 'user_id' not in session:
-    #     return redirect("https://storage.googleapis.com/capstone-frontend/index.html")
-    user_id = 1
+    user_id = session.get('user_id')
+    if user_id is None:
+        return jsonify({'error': 'User not authenticated', 'redirect': 'login'}), 401
+    print(user_id)
     portfolio = user_database(user_id)
     get_past_values(portfolio.keys())
     output = {'symbols': {}}
@@ -137,7 +147,7 @@ def modify_portfolio():
     data = request.get_json()
     if data is None:
         return jsonify({"error": "Invalid JSON or no data provided"}), 400
-    user_id = 1  # This should ideally come from the session or request, not hardcoded
+    user_id = session['user_id']  # This should ideally come from the session or request, not hardcoded
     stock = data.get('stock_symbol')
     quantity = data.get('quantity')
     operation = data.get('operation')

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./StockList.css";
 
 function StockList() {
+    const navigate = useNavigate();
     const [portfolio, setPortfolio] = useState({ total_value: 0, symbols: {} });
     const [error, setError] = useState(null);
     const [formError, setFormError] = useState(null);
@@ -15,11 +16,14 @@ function StockList() {
     useEffect(() => {
         fetch("https://mcsbt-integration-415614.oa.r.appspot.com/overview", {
             credentials: "include",
-            redirect: "follow",
         })
             .then((response) => {
                 if (!response.ok) {
-                    throw new Error("Network response was not ok");
+                    if (response.status === 401) {
+                        // Redirect to the login page
+                        navigate(""); // make sure you have 'navigate' from useNavigate()
+                    }
+                    throw new Error("Not authorized");
                 }
                 return response.json();
             })
