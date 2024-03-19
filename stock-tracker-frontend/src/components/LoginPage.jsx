@@ -29,7 +29,7 @@ function LoginPage() {
                 throw new Error(`HTTP error! status: ${response.status}`);
             } else {
                 // Redirect to another page on successful login
-                navigate("/overview"); // Using navigate instead of history.push
+                navigate("/overview");
             }
         } catch (error) {
             console.error("Error during login:", error);

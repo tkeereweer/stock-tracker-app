@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, session, request, redirect, url_for
+from flask import Flask, jsonify, session, request, make_response
 from dotenv import load_dotenv
 import os
 from flask_cors import CORS
@@ -89,9 +89,11 @@ def handle_register():
             )
             transaction.commit()
         user = connection.execute(get_user_query, {"username": username}).fetchone()
-        session.permanent = True
-        session["user_id"] = user[0]
-    return jsonify({"message": "Registration successful"}), 200
+        if user:
+            session.permanent = True
+            session["user_id"] = user[0]
+            response = jsonify({"message": "Login successful"})
+            return response, 200
 
 @app.route("/login", methods=["POST"])
 def handle_login():
@@ -117,8 +119,10 @@ def handle_login():
 
 @app.route("/logout")
 def logout():
-    session.pop("user_id")
-    return redirect("https://storage.googleapis.com/capstone-frontend/index.html")
+    session.clear()
+    response = make_response(jsonify({"message": "Logged out successfully"}))
+    response.set_cookie('session', '', expires=0)
+    return response, 200
 
 # get the portfolio of a user
 @app.route('/overview')
@@ -126,8 +130,9 @@ def stocklist():
     user_id = session.get('user_id')
     if user_id is None:
         return jsonify({'error': 'User not authenticated', 'redirect': 'login'}), 401
-    print(user_id)
     portfolio = user_database(user_id)
+    if not portfolio:
+        return jsonify({'message': 'Portfolio empty', 'symbols': {}, 'total_value': 0.0}), 200
     get_past_values(portfolio.keys())
     output = {'symbols': {}}
     total_value = 0

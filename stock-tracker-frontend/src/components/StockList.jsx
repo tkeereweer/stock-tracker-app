@@ -31,8 +31,14 @@ function StockList() {
                 setPortfolio(data); // Set the entire data structure
             })
             .catch((error) => {
-                console.error("Error fetching portfolio:", error);
-                setError("Failed to fetch portfolio. Please try again later.");
+                if (error.message === "Portfolio empty") {
+                    setError("No stocks in portfolio. Please add stocks.");
+                } else {
+                    console.error("Error fetching portfolio:", error);
+                    setError(
+                        "Failed to fetch portfolio. Please try again later."
+                    );
+                }
             });
     }, []);
 
@@ -89,6 +95,21 @@ function StockList() {
         }
     };
 
+    const handleLogout = async () => {
+        try {
+            await fetch(
+                "https://mcsbt-integration-415614.oa.r.appspot.com/logout",
+                {
+                    credentials: "include",
+                    redirect: "follow",
+                }
+            );
+            navigate("/"); // Redirect to login page or home page after logout
+        } catch (error) {
+            console.error("Logout failed:", error);
+        }
+    };
+
     if (error) {
         return <div className="container">{error}</div>;
     }
@@ -96,6 +117,7 @@ function StockList() {
     return (
         <div className="container">
             <h1>Stock Portfolio</h1>
+            <button onClick={handleLogout}>Logout</button>
             <form onSubmit={handleSubmit}>
                 <input
                     type="text"
@@ -158,7 +180,8 @@ function StockList() {
                                             </Link>
                                         </td>
                                         <td>{details.quantity}</td>
-                                        <td>${details.value}</td>{" "}
+                                        <td>${details.value}</td>
+                                        {""}
                                         {/* Displaying value */}
                                     </tr>
                                 )

@@ -17,6 +17,7 @@ function RegisterPage() {
                 "https://mcsbt-integration-415614.oa.r.appspot.com/register",
                 {
                     method: "POST",
+                    credentials: "include", // Important for cookies
                     headers: {
                         "Content-Type": "application/x-www-form-urlencoded",
                     },
@@ -29,8 +30,7 @@ function RegisterPage() {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             } else {
-                // Redirect to login page on successful registration
-                navigate("/"); // Assuming "/" is your login route
+                navigate("/overview");
             }
         } catch (error) {
             console.error("Error during registration:", error);

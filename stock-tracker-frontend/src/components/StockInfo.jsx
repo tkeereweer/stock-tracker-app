@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { Line } from "react-chartjs-2";
 import {
     Chart as ChartJS,
@@ -29,6 +29,7 @@ function numberWithCommas(x) {
 
 function StockInfo() {
     const { symbol } = useParams();
+    const navigate = useNavigate();
     const [stockInfo, setStockInfo] = useState([]);
     const [chartData, setChartData] = useState({
         labels: [],
@@ -81,6 +82,21 @@ function StockInfo() {
             });
     }, [symbol]);
 
+    const handleLogout = async () => {
+        try {
+            await fetch(
+                "https://mcsbt-integration-415614.oa.r.appspot.com/logout",
+                {
+                    credentials: "include",
+                    redirect: "follow",
+                }
+            );
+            navigate("/"); // Redirect to login page or home page after logout
+        } catch (error) {
+            console.error("Logout failed:", error);
+        }
+    };
+
     if (error) {
         return <div className="container">{error}</div>;
     }
@@ -88,6 +104,7 @@ function StockInfo() {
     return (
         <div className="container">
             <h1>Stock Information for {symbol}</h1>
+            <button onClick={handleLogout}>Logout</button>
             <Line data={chartData} key={chartData.labels.length} />
             <table>
                 <thead>
