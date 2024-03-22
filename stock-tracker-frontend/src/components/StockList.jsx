@@ -12,6 +12,8 @@ function StockList() {
         quantity: "",
         operation: "add",
     });
+    const [searchInput, setSearchInput] = useState("");
+    const [searchResults, setSearchResults] = useState([]);
 
     useEffect(() => {
         fetch("https://mcsbt-integration-415614.oa.r.appspot.com/overview", {
@@ -49,6 +51,28 @@ function StockList() {
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setForm({ ...form, [name]: value });
+    };
+
+    const handleSearchInputChange = async (e) => {
+        setSearchInput(e.target.value);
+
+        if (e.target.value.length > 1) {
+            try {
+                const response = await fetch(
+                    `https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${e.target.value}&apikey=UDJ8FEEUYB4NYVJ6`
+                );
+                const data = await response.json();
+                if (data.bestMatches) {
+                    setSearchResults(data.bestMatches);
+                } else {
+                    setSearchResults([]);
+                }
+            } catch (error) {
+                console.error("Error fetching search results:", error);
+            }
+        } else {
+            setSearchResults([]);
+        }
     };
 
     const handleSubmit = async (e) => {
@@ -115,81 +139,114 @@ function StockList() {
     }
 
     return (
-        <div className="container">
-            <h1>Stock Portfolio</h1>
-            <button onClick={handleLogout}>Logout</button>
-            <form onSubmit={handleSubmit}>
-                <input
-                    type="text"
-                    name="stock_symbol"
-                    value={form.stock_symbol}
-                    onChange={handleInputChange}
-                    placeholder="Stock Symbol"
-                    required
-                />
-                <input
-                    type="number"
-                    name="quantity"
-                    value={form.quantity}
-                    onChange={handleInputChange}
-                    placeholder="Quantity"
-                    required
-                />
-                <div>
+        <div>
+            <div className="header">
+                <button onClick={handleLogout} className="logout-button">
+                    Logout
+                </button>
+            </div>
+            <div className="container">
+                <h1>Stock Portfolio</h1>
+                <form onSubmit={handleSubmit}>
+                    <div className="input-dropdown-container">
+                        <input
+                            type="text"
+                            name="stock_symbol"
+                            value={form.stock_symbol}
+                            onChange={(e) => {
+                                handleInputChange(e);
+                                handleSearchInputChange(e);
+                            }}
+                            placeholder="Stock Symbol"
+                            required
+                        />
+                        {searchResults.length > 0 && (
+                            <ul className="search-results">
+                                {searchResults.map((result, index) => (
+                                    <li
+                                        key={index}
+                                        onClick={() => {
+                                            setForm({
+                                                ...form,
+                                                stock_symbol:
+                                                    result["1. symbol"],
+                                            });
+                                            setSearchResults([]);
+                                        }}
+                                    >
+                                        {result["1. symbol"]} -{" "}
+                                        {result["2. name"]}
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                    </div>
                     <input
-                        type="radio"
-                        name="operation"
-                        value="add"
-                        checked={form.operation === "add"}
+                        type="number"
+                        name="quantity"
+                        value={form.quantity}
                         onChange={handleInputChange}
+                        placeholder="Quantity"
+                        required
                     />
-                    Add
-                    <input
-                        type="radio"
-                        name="operation"
-                        value="remove"
-                        checked={form.operation === "remove"}
-                        onChange={handleInputChange}
-                    />
-                    Remove
-                </div>
-                <button type="submit">Submit</button>
-            </form>
-            {formError && <div className="error">{formError}</div>}
-            {isPortfolioEmpty() ? (
-                <p>Portfolio is empty. Please add stocks.</p>
-            ) : (
-                <>
-                    {/* Displaying total portfolio value */}
-                    <p>Total Portfolio Value: ${portfolio.total_value}</p>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Stock Symbol</th>
-                                <th>Quantity</th>
-                                <th>Value</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {Object.entries(portfolio.symbols).map(
-                                ([stock, details], index) => (
-                                    <tr key={index}>
-                                        <td>
-                                            <Link to={`/stockinfo/${stock}`}>
-                                                {stock}
-                                            </Link>
-                                        </td>
-                                        <td>{details.quantity}</td>
-                                        <td>${details.value}</td>
-                                        {""}
-                                        {/* Displaying value */}
-                                    </tr>
-                                )
-                            )}
-                        </tbody>
-                    </table>
-                </>
-            )}
+                    <div>
+                        <input
+                            type="radio"
+                            name="operation"
+                            value="add"
+                            checked={form.operation === "add"}
+                            onChange={handleInputChange}
+                        />
+                        Add
+                        <input
+                            type="radio"
+                            name="operation"
+                            value="remove"
+                            checked={form.operation === "remove"}
+                            onChange={handleInputChange}
+                        />
+                        Remove
+                    </div>
+                    <button type="submit">Submit</button>
+                </form>
+                {formError && <div className="error">{formError}</div>}
+                {isPortfolioEmpty() ? (
+                    <p>Portfolio is empty. Please add stocks.</p>
+                ) : (
+                    <>
+                        {/* Displaying total portfolio value */}
+                        <p>Total Portfolio Value: ${portfolio.total_value}</p>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Stock Symbol</th>
+                                    <th>Quantity</th>
+                                    <th>Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {Object.entries(portfolio.symbols).map(
+                                    ([stock, details], index) => (
+                                        <tr key={index}>
+                                            <td>
+                                                <Link
+                                                    to={`/stockinfo/${stock}`}
+                                                >
+                                                    {stock}
+                                                </Link>
+                                            </td>
+                                            <td>{details.quantity}</td>
+                                            <td>${details.value}</td>
+                                            {""}
+                                            {/* Displaying value */}
+                                        </tr>
+                                    )
+                                )}
+                            </tbody>
+                        </table>
+                    </>
+                )}
+            </div>
         </div>
     );
 }

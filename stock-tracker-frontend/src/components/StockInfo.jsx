@@ -57,10 +57,11 @@ function StockInfo() {
             .then((data) => {
                 setStockInfo(data);
                 if (data && Array.isArray(data)) {
-                    const dates = data.map((item) => item[0]);
-                    const closePrices = data.map((item) =>
-                        Number(item[1]["4. close"])
-                    );
+                    const dates = data.map((item) => item[0]).reverse(); // This line is changed to reverse the order
+                    const closePrices = data
+                        .map((item) => Number(item[1]["4. close"]))
+                        .reverse(); // Reverse the order of prices to match dates
+
                     setChartData({
                         labels: dates,
                         datasets: [
@@ -102,50 +103,56 @@ function StockInfo() {
     }
 
     return (
-        <div className="container">
-            <h1>Stock Information for {symbol}</h1>
-            <button onClick={handleLogout}>Logout</button>
-            <Line data={chartData} key={chartData.labels.length} />
-            <table>
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Open</th>
-                        <th>High</th>
-                        <th>Low</th>
-                        <th>Close</th>
-                        <th>Volume</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {stockInfo.map((day, index) => (
-                        <tr key={index}>
-                            <td>{day[0]}</td>
-                            <td>
-                                {numberWithCommas(
-                                    Number(day[1]["1. open"]).toFixed(2)
-                                )}
-                            </td>
-                            <td>
-                                {numberWithCommas(
-                                    Number(day[1]["2. high"]).toFixed(2)
-                                )}
-                            </td>
-                            <td>
-                                {numberWithCommas(
-                                    Number(day[1]["3. low"]).toFixed(2)
-                                )}
-                            </td>
-                            <td>
-                                {numberWithCommas(
-                                    Number(day[1]["4. close"]).toFixed(2)
-                                )}
-                            </td>
-                            <td>{numberWithCommas(day[1]["5. volume"])}</td>
+        <div>
+            <div className="header">
+                <button onClick={handleLogout} className="logout-button">
+                    Logout
+                </button>
+            </div>
+            <div className="container">
+                <h1>Stock Information for {symbol}</h1>
+                <Line data={chartData} key={chartData.labels.length} />
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Open</th>
+                            <th>High</th>
+                            <th>Low</th>
+                            <th>Close</th>
+                            <th>Volume</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {stockInfo.map((day, index) => (
+                            <tr key={index}>
+                                <td>{day[0]}</td>
+                                <td>
+                                    {numberWithCommas(
+                                        Number(day[1]["1. open"]).toFixed(2)
+                                    )}
+                                </td>
+                                <td>
+                                    {numberWithCommas(
+                                        Number(day[1]["2. high"]).toFixed(2)
+                                    )}
+                                </td>
+                                <td>
+                                    {numberWithCommas(
+                                        Number(day[1]["3. low"]).toFixed(2)
+                                    )}
+                                </td>
+                                <td>
+                                    {numberWithCommas(
+                                        Number(day[1]["4. close"]).toFixed(2)
+                                    )}
+                                </td>
+                                <td>{numberWithCommas(day[1]["5. volume"])}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 }

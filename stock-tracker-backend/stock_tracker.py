@@ -121,7 +121,6 @@ def handle_login():
 def logout():
     session.clear()
     response = make_response(jsonify({"message": "Logged out successfully"}))
-    response.set_cookie('session', '', expires=0)
     return response, 200
 
 # get the portfolio of a user
@@ -169,10 +168,6 @@ def modify_portfolio():
 
 # add a stock to a user's portfolio
 def add_stock(user_id, stock, quantity):
-    response = requests.get(f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={stock}&apikey={API_KEY}")
-    real_stock_check = response.json()
-    if "Error Message" in real_stock_check.keys():
-        return jsonify({"error": "Invalid stock symbol"}), 400
     insert_query = text("""
         INSERT INTO USER_STOCKS (USERID, STOCKSYMBOL, QUANTITY) 
         VALUES (:user_id, :stock, :quantity)

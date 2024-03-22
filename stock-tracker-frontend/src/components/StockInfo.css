@@ -1,9 +1,46 @@
 /* StockInfo.css */
 
-.container {
-    max-width: 800px;
-    margin: 0 auto;
+body {
+    display: grid;
+    place-items: center;
+    height: 100vh;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+}
+
+.header {
+    position: absolute;
+    top: 0;
+    right: 0;
     padding: 20px;
+}
+
+.logout-button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #0073b1;
+    color: white;
+    border: none;
+    border-radius: 24px;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s;
+}
+
+.logout-button:hover {
+    background-color: #0056b3;
+}
+
+.container {
+    width: 100%;
+    max-width: 1000px; /* Adjust width as needed */
+    margin: 60px auto 0; /* Adjust top margin to accommodate the header */
+    padding: 40px; /* Increased padding for spaciousness */
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 h1 {

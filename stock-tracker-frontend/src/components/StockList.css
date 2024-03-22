@@ -1,14 +1,121 @@
 /* StockList.css */
+body {
+    display: grid;
+    place-items: center;
+    height: 100vh;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+}
 
-.container {
-    max-width: 800px;
-    margin: 0 auto;
+.header {
+    position: absolute;
+    top: 0;
+    right: 0;
     padding: 20px;
 }
 
+.logout-button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #0073b1;
+    color: white;
+    border: none;
+    border-radius: 24px;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s;
+}
+
+.logout-button:hover {
+    background-color: #0056b3;
+}
+
+.container {
+    max-width: 1000px; /* Adjust width as needed */
+    width: 100%;
+    margin: 0 auto;
+    padding: 40px; /* Increased padding for spaciousness */
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-gap: 20px; /* Spacing between grid items */
+    align-items: start;
+}
+
 h1 {
-    font-size: 24px;
-    margin-bottom: 20px;
+    font-size: 26px;
+    color: rgba(0, 0, 0, 0.9);
+    margin-bottom: 30px; /* Increase margin for more space */
+}
+
+form {
+    position: relative; /* Add this line */
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-gap: 10px;
+    align-items: center;
+    justify-items: start;
+}
+
+form input[type="text"],
+form input[type="number"] {
+    padding: 15px; /* Larger padding for input fields */
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-bottom: 0; /* Removed bottom margin */
+}
+
+form input[type="radio"] {
+    margin-right: 5px;
+}
+
+form button {
+    padding: 15px 30px; /* Larger padding for buttons */
+    font-size: 16px;
+    border-radius: 24px; /* Rounded edges for buttons */
+    /* Rest of the button styles remain unchanged */
+}
+
+.input-dropdown-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.search-results {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    border: 1px solid #ddd;
+    position: absolute;
+    top: 100%; /* Aligns the dropdown right below the input field */
+    left: 0;
+    width: 100%; /* Ensure the dropdown matches the input field's width */
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 2; /* Ensures dropdown is above other content */
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.search-results li {
+    padding: 10px;
+    cursor: pointer;
+    line-height: 1.5;
+}
+
+.search-results li:hover {
+    background-color: #f0f0f0; /* highlight on hover */
+}
+
+.search-results li:not(:last-child) {
+    border-bottom: 1px solid #ddd; /* Add a border between items */
 }
 
 table {
@@ -45,8 +152,8 @@ tr:hover {
 }
 
 a {
-    text-decoration: none;
     color: #007bff;
+    text-decoration: none;
 }
 
 a:hover {

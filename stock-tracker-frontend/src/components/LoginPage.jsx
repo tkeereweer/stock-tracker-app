@@ -37,8 +37,9 @@ function LoginPage() {
     };
 
     return (
-        <div>
+        <div className="auth-container">
             <h2>Login</h2>
+            <p>Get insights about your stock portfolio</p>
             <form onSubmit={handleLogin}>
                 <input
                     type="text"
@@ -58,9 +59,9 @@ function LoginPage() {
                 />
                 <button type="submit">Login</button>
             </form>
-            <p>
-                Don't have an account? <Link to="/register">Register here</Link>
-                .
+            <p className="link-to-register">
+                Don't have an account yet?{" "}
+                <Link to="/register">Register here</Link>
             </p>
         </div>
     );

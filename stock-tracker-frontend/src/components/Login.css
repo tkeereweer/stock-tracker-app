@@ -1,47 +1,85 @@
-/* Login.css */
+/* Common styles for both login and register containers */
+body,
+html {
+    height: 100%;
+    margin: 0;
+    display: grid;
+    place-items: center; /* shorthand for align-items and justify-items */
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+}
 
-.login-container {
+.auth-container {
+    width: 100%;
     max-width: 400px;
-    margin: 20px auto;
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+    padding: 40px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
     background-color: #fff;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.login-container h2 {
-    font-size: 24px;
-    margin-bottom: 20px;
-    text-align: center;
+/* Shared form and input styles */
+.auth-container h2 {
+    font-size: 26px;
+    font-weight: 400;
+    margin-bottom: 10px;
+    color: rgba(0, 0, 0, 0.9);
 }
 
-.login-container form {
+.auth-container form {
     display: flex;
     flex-direction: column;
 }
 
-.login-container input {
-    margin-bottom: 10px;
-    padding: 10px;
-    border: 1px solid #ddd;
+.auth-container input {
+    margin-bottom: 20px;
+    padding: 15px;
+    font-size: 16px;
+    border: 1px solid #ccc;
     border-radius: 4px;
 }
 
-.login-container button {
-    padding: 10px;
-    background-color: #007bff;
+.auth-container input:focus {
+    outline-color: #0073b1;
+}
+
+.auth-container button {
+    padding: 15px;
+    background-color: #0073b1;
     color: white;
+    font-size: 16px;
     border: none;
-    border-radius: 4px;
+    border-radius: 24px;
     cursor: pointer;
+    margin-bottom: 20px;
 }
 
-.login-container button:hover {
+.auth-container button:hover {
     background-color: #0056b3;
 }
 
-.login-container p {
-    text-align: center;
-    margin-top: 10px;
+.auth-container p {
+    margin-top: 20px;
+    font-size: 14px;
+    color: rgba(0, 0, 0, 0.6);
+}
+
+.auth-container a {
+    color: #0073b1;
+    text-decoration: none;
+}
+
+.auth-container a:hover {
+    text-decoration: underline;
+}
+
+.error {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #ffdddd;
+    border-left: 4px solid #ff0000;
+    color: #d8000c;
+    font-size: 14px;
+    text-align: left;
 }

@@ -39,8 +39,9 @@ function RegisterPage() {
     };
 
     return (
-        <div>
+        <div className="auth-container">
             <h2>Register</h2>
+            <p>Get insights about your stock portfolio</p>
             <form onSubmit={handleRegister}>
                 <input
                     type="text"
@@ -62,7 +63,7 @@ function RegisterPage() {
             </form>
             {error && <div className="error">{error}</div>}
             <p>
-                Already have an account? <Link to="/">Login here</Link>.
+                Already have an account? <Link to="/">Login here</Link>
             </p>
         </div>
     );
