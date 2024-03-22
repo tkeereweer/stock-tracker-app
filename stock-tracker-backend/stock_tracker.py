@@ -115,7 +115,7 @@ def handle_login():
             # response.set_cookie('session', str(session["user_id"]), httponly=True, samesite='Lax')
             return response, 200
         else:
-            return jsonify({"error": "Invalid credentials"}), 401
+            return jsonify({"error": "Login failed: Username or Password incorrect"}), 401
 
 @app.route("/logout")
 def logout():
