@@ -28,17 +28,15 @@ function LoginPage() {
             );
 
             if (!response.ok) {
-                // Check if the status code is 401 for custom error message
-                if (response.status === 401) {
-                    const errorData = await response.json();
+                if (response.status === 401 || response.status === 500) {
                     throw new Error(
-                        errorData.error ||
-                            "Login failed: Username or Password incorrect"
+                        "Login failed: Username or Password incorrect"
                     );
-                } else {
-                    // For other status codes, use a generic message
-                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
+                const errorData = await response.json();
+                throw new Error(
+                    errorData.error || `HTTP error! status: ${response.status}`
+                );
             } else {
                 navigate("/overview");
             }

@@ -41,7 +41,7 @@ def hash_value(string):
     hash.update(string.encode())
     return hash.hexdigest()
 
-# get stocks in a user's portfolio, hardcoded for now
+# get stocks in a user's portfolio
 def user_database(user_id):
     global portfolio
     user_stocks_query = text("""
@@ -61,7 +61,7 @@ def get_past_values(portfolio):
     for stock in portfolio:
         try:
             response = requests.get(f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={stock}&apikey={API_KEY}") 
-            response.raise_for_status()  # Raises HTTPError for bad response status codes
+            response.raise_for_status()
             data = response.json()
             stock_values_lst = list(data['Time Series (Daily)'].items())[0:20]
             stock_values[stock] = stock_values_lst
@@ -70,6 +70,7 @@ def get_past_values(portfolio):
     return stock_values
 
 # flask endpoints
+# register a new user
 @app.route("/register", methods=["POST"])
 def handle_register():
     username = str(request.form["username"])
@@ -95,6 +96,7 @@ def handle_register():
             response = jsonify({"message": "Login successful"})
             return response, 200
 
+# login a user
 @app.route("/login", methods=["POST"])
 def handle_login():
     username = request.form["username"]
@@ -105,18 +107,19 @@ def handle_login():
         WHERE USERNAME=:username and PASSWORD=:password
     """)
     with engine.connect() as connection:
-        user = connection.execute(
-            login_query, {"username": username, "password": password}
-        ).fetchone()
-        if user:
-            session.permanent = True
-            session["user_id"] = user[0]
-            response = jsonify({"message": "Login successful"})
-            # response.set_cookie('session', str(session["user_id"]), httponly=True, samesite='Lax')
-            return response, 200
-        else:
+        try:
+            user = connection.execute(
+                login_query, {"username": username, "password": password}
+            ).fetchone()
+            if user:
+                session.permanent = True
+                session["user_id"] = user[0]
+                response = jsonify({"message": "Login successful"})
+                return response, 200
+        except:
             return jsonify({"error": "Login failed: Username or Password incorrect"}), 401
 
+# logout a user
 @app.route("/logout")
 def logout():
     session.clear()
@@ -146,12 +149,13 @@ def stocklist():
     output['total_value']= round(total_value, 2)
     return jsonify(output)
 
+# modify the portfolio of a user
 @app.route('/modifyPortfolio', methods=['POST'])
 def modify_portfolio():
     data = request.get_json()
     if data is None:
         return jsonify({"error": "Invalid JSON or no data provided"}), 400
-    user_id = session['user_id']  # This should ideally come from the session or request, not hardcoded
+    user_id = session['user_id']
     stock = data.get('stock_symbol')
     quantity = data.get('quantity')
     operation = data.get('operation')
