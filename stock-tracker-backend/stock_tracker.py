@@ -17,11 +17,10 @@ CORS(
     resources={r"/*": {"origins": "*"}})
 
 # database connection
-db_user = "flask-stock-tracker"
-db_pass = "Vissermeet1122"
-db_name = "capstone-database"
-# db_public_ip = "34.140.3.223"
-cloud_sql_connection_name = "mcsbt-integration-415614:europe-west1:capstone-db"
+db_user = os.getenv('DB_USER')
+db_pass = os.getenv('DB_PASS')
+db_name = os.getenv('DB_NAME')
+cloud_sql_connection_name = os.getenv('CONN_NAME')
 app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
 db_string = f"mysql+pymysql://{db_user}:{db_pass}@/{db_name}?unix_socket=/cloudsql/{cloud_sql_connection_name}"
 
@@ -30,8 +29,7 @@ engine = create_engine(db_string)
 # load the environment variables
 # load_dotenv()
 
-# API_KEY = os.getenv('API_KEY')
-API_KEY = 'UDJ8FEEUYB4NYVJ6'
+API_KEY = os.getenv('API_KEY')
 
 stock_values = {}
 portfolio = {}
